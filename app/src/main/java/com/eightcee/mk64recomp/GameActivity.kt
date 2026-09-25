@@ -81,6 +81,10 @@ class GameActivity : Activity(), SurfaceHolder.Callback {
                 KeyEvent.KEYCODE_BUTTON_START -> NativeBridge.BUTTON_START
                 KeyEvent.KEYCODE_BUTTON_X -> NativeBridge.BUTTON_C_LEFT
                 KeyEvent.KEYCODE_BUTTON_Y -> NativeBridge.BUTTON_C_UP
+                KeyEvent.KEYCODE_DPAD_UP -> NativeBridge.BUTTON_DPAD_UP
+                KeyEvent.KEYCODE_DPAD_DOWN -> NativeBridge.BUTTON_DPAD_DOWN
+                KeyEvent.KEYCODE_DPAD_LEFT -> NativeBridge.BUTTON_DPAD_LEFT
+                KeyEvent.KEYCODE_DPAD_RIGHT -> NativeBridge.BUTTON_DPAD_RIGHT
                 else -> -1
             }
             if (button >= 0) {
@@ -117,6 +121,13 @@ class GameActivity : Activity(), SurfaceHolder.Callback {
     private fun axis(event: MotionEvent, primary: Int, fallback: Int): Float {
         val p = event.getAxisValue(primary)
         return if (p != 0f) p else event.getAxisValue(fallback)
+    }
+
+    override fun onPause() {
+        NativeBridge.releaseAllButtons()
+        NativeBridge.setStick(0f, 0f)
+        Diagnostics.info("GameActivity.onPause input released")
+        super.onPause()
     }
 
     override fun onDestroy() {
