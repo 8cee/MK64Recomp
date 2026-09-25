@@ -41,14 +41,9 @@ class MainActivity : Activity() {
         }
 
         val diagnosticsButton = Button(this).apply {
-            text = "Create Diagnostic Report"
+            text = "Logs & Diagnostics"
             setOnClickListener {
-                val report = DiagnosticReport.create(this@MainActivity)
-                Toast.makeText(
-                    this@MainActivity,
-                    "Diagnostic report: " + report.name,
-                    Toast.LENGTH_LONG
-                ).show()
+                startActivity(Intent(this@MainActivity, DiagnosticsActivity::class.java))
             }
         }
 
