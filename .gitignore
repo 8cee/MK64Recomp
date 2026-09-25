@@ -1,0 +1,16 @@
+.gradle/
+.idea/
+local.properties
+**/build/
+.externalNativeBuild/
+.cxx/
+*.jks
+*.keystore
+keystore.properties
+*.z64
+*.n64
+*.v64
+roms/
+assets/game/
+*.log
+diagnostics/
