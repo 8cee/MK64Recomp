@@ -10,10 +10,13 @@ jobs:
   bundle:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout MK64 Android repo with upstream source
+      - name: Checkout MK64 Android repo
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Checkout only MK64 generation inputs
+        run: |
+          git submodule update --init upstream/MK64Recomp
+          git -C upstream/MK64Recomp submodule update --init MK64RecompSyms
 
       - name: Install build tools
         run: |
