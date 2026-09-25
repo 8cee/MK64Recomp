@@ -2,6 +2,10 @@ name: Build N64Recomp Tools
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/workflows/build-recomp-tools.yml"
 
 jobs:
   build-tools:
