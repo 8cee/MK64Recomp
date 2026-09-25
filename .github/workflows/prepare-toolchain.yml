@@ -1,0 +1,40 @@
+name: Prepare MK64 Toolchain
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MK64 Android repo with upstream source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang
+
+      - name: Build N64Recomp tools
+        run: |
+          git clone --recursive https://github.com/N64Recomp/N64Recomp.git /tmp/N64Recomp
+          cd /tmp/N64Recomp
+          git checkout 989a86b36912403cd323de884bf834f2605ea770
+          git submodule update --init --recursive
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target N64RecompCLI RSPRecomp -j2
+          mkdir -p "$GITHUB_WORKSPACE/toolchain"
+          cp build/N64Recomp "$GITHUB_WORKSPACE/toolchain/"
+          cp build/RSPRecomp "$GITHUB_WORKSPACE/toolchain/"
+
+      - name: Package upstream MK64 source
+        run: |
+          tar -czf toolchain/MK64Recomp-upstream.tar.gz             --exclude='.git'             --exclude='mk64.us.z64'             -C upstream MK64Recomp
+
+      - name: Upload toolchain
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK64Recomp-toolchain
+          path: toolchain/
