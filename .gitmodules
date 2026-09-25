@@ -1,0 +1,3 @@
+[submodule "upstream/MK64Recomp"]
+	path = upstream/MK64Recomp
+	url = https://github.com/arefdsg/MK64Recomp.git
