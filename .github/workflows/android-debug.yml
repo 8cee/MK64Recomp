@@ -24,7 +24,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Validate multiplayer server
-        run: python3 -m py_compile server/mk64_server.py
+        run: |
+          python3 -m py_compile server/mk64_server.py
+          cd server
+          python3 -m unittest -v test_server.py
 
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace
