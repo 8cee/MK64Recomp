@@ -36,8 +36,8 @@ class MainActivity : Activity() {
         }
 
         val launchButton = Button(this).apply {
-            text = "Initialize Native Runtime"
-            setOnClickListener { initializeRuntime() }
+            text = "Play / Open Game Host"
+            setOnClickListener { initializeAndLaunch() }
         }
 
         val diagnosticsButton = Button(this).apply {
@@ -96,7 +96,7 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun initializeRuntime() {
+    private fun initializeAndLaunch() {
         val rom = RomManager.installedRom(this)
         val validation = RomManager.validate(rom)
 
@@ -118,7 +118,8 @@ class MainActivity : Activity() {
 
         if (result == 0) {
             Diagnostics.info("Native runtime initialized successfully")
-            Toast.makeText(this, "Native runtime initialized", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Opening Android game host", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, GameActivity::class.java))
         } else {
             Diagnostics.error("Native runtime returned error=" + result)
             Toast.makeText(this, "Native initialization failed: " + result, Toast.LENGTH_LONG).show()
