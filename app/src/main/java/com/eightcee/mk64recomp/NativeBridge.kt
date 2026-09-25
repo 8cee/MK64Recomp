@@ -28,6 +28,7 @@ object NativeBridge {
     }
 
     external fun nativeVersion(): String
+    external fun graphicsInfo(): String
     external fun initialize(romPath: String): Int
     external fun shutdown()
 
