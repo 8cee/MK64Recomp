@@ -6,10 +6,12 @@ add_library(
     SHARED
     native_bridge.cpp
     crash_handler.cpp
+    graphics_probe.cpp
 )
 
 find_library(log-lib log)
 find_library(android-lib android)
+find_library(vulkan-lib vulkan)
 
 target_compile_features(mk64android PRIVATE cxx_std_20)
 
