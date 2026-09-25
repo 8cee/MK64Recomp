@@ -1,0 +1,41 @@
+name: Build N64Recomp Tools
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build cmake g++
+
+      - name: Checkout N64Recomp
+        uses: actions/checkout@v4
+        with:
+          repository: N64Recomp/N64Recomp
+          ref: 989a86b36912403cd323de884bf834f2605ea770
+          submodules: recursive
+          path: N64RecompSource
+
+      - name: Configure
+        run: cmake -S N64RecompSource -B N64RecompSource/build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build tools
+        run: cmake --build N64RecompSource/build --target N64RecompCLI RSPRecomp -j$(nproc)
+
+      - name: Collect tools
+        run: |
+          mkdir -p out
+          find N64RecompSource/build -type f -name N64Recomp -exec cp {} out/N64Recomp \;
+          find N64RecompSource/build -type f -name RSPRecomp -exec cp {} out/RSPRecomp \;
+          chmod +x out/N64Recomp out/RSPRecomp
+          ./out/N64Recomp --help >/dev/null 2>&1 || true
+          ./out/RSPRecomp --help >/dev/null 2>&1 || true
+          ls -lh out
+
+      - name: Upload tools
+        uses: actions/upload-artifact@v4
+        with:
+          name: n64recomp-linux-tools
+          path: out/
