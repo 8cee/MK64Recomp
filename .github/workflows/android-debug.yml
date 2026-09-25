@@ -37,3 +37,40 @@ jobs:
         with:
           name: MK64Recomp-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+
+
+  toolchain_bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout only MK64 generation inputs
+        run: |
+          git submodule update --init upstream/MK64Recomp
+          git -C upstream/MK64Recomp submodule update --init MK64RecompSyms
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang
+
+      - name: Build N64Recomp tools
+        run: |
+          git clone --recursive https://github.com/N64Recomp/N64Recomp.git /tmp/N64Recomp
+          cd /tmp/N64Recomp
+          git checkout 989a86b36912403cd323de884bf834f2605ea770
+          git submodule update --init --recursive
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target N64RecompCLI RSPRecomp -j2
+          mkdir -p "$GITHUB_WORKSPACE/toolchain"
+          cp build/N64Recomp "$GITHUB_WORKSPACE/toolchain/"
+          cp build/RSPRecomp "$GITHUB_WORKSPACE/toolchain/"
+
+      - name: Package MK64 generation source
+        run: |
+          tar -czf toolchain/MK64Recomp-generation-source.tar.gz             --exclude='.git'             --exclude='mk64.us.z64'             -C upstream MK64Recomp
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MK64Recomp-local-generation-toolchain
+          path: toolchain/
