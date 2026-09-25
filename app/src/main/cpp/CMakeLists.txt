@@ -5,6 +5,7 @@ add_library(
     mk64android
     SHARED
     native_bridge.cpp
+    crash_handler.cpp
 )
 
 find_library(log-lib log)
