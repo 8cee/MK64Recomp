@@ -21,6 +21,7 @@ object DiagnosticReport {
             appendLine("Android: " + Build.VERSION.RELEASE + " (SDK " + Build.VERSION.SDK_INT + ")")
             appendLine("Device: " + Build.MANUFACTURER + " " + Build.MODEL)
             appendLine("ABI: " + Build.SUPPORTED_ABIS.joinToString())
+            appendLine("Graphics: " + runCatching { NativeBridge.graphicsInfo() }.getOrElse { "probe failed: " + it.message })
             appendLine()
             appendLine("ROM")
             val rom = RomManager.installedRom(context)
