@@ -19,4 +19,5 @@ target_link_libraries(
     mk64android
     ${log-lib}
     ${android-lib}
+    ${vulkan-lib}
 )
