@@ -23,10 +23,14 @@ jobs:
         run: |
           mkdir -p buildkit/sources buildkit/reference
 
-          curl -L --fail --retry 3             https://github.com/libsdl-org/SDL/releases/download/release-2.30.8/SDL2-2.30.8.tar.gz             -o /tmp/SDL2.tar.gz
+          curl -L --fail --retry 3 \
+            https://github.com/libsdl-org/SDL/releases/download/release-2.30.8/SDL2-2.30.8.tar.gz \
+            -o /tmp/SDL2.tar.gz
           tar -xzf /tmp/SDL2.tar.gz -C buildkit/sources
 
-          curl -L --fail --retry 3             https://github.com/freetype/freetype/archive/refs/tags/VER-2-13-2.tar.gz             -o /tmp/freetype.tar.gz
+          curl -L --fail --retry 3 \
+            https://github.com/freetype/freetype/archive/refs/tags/VER-2-13-2.tar.gz \
+            -o /tmp/freetype.tar.gz
           tar -xzf /tmp/freetype.tar.gz -C buildkit/sources
 
           git clone --depth 1 https://github.com/8cee/dk64-recomp-android.git /tmp/dk64
@@ -37,17 +41,48 @@ jobs:
 
       - name: Package NDK
         run: |
-          tar -I 'zstd -6 -T0' -cf buildkit/android-ndk-r27d.tar.zst             -C "$ANDROID_HOME/ndk" 27.3.13750724
+          tar -I 'zstd -6 -T0' -cf /tmp/android-ndk-r27d.tar.zst \
+            -C "$ANDROID_HOME/ndk" 27.3.13750724
+          split -b 300M -d -a 2 /tmp/android-ndk-r27d.tar.zst \
+            buildkit/android-ndk-r27d.tar.zst.part-
+          ls -lh buildkit/android-ndk-r27d.tar.zst.part-*
 
       - name: Package Android build-tools
         run: |
           BUILD_TOOLS="$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
           echo "$BUILD_TOOLS" > buildkit/build-tools-version.txt
-          tar -I 'zstd -6 -T0' -cf buildkit/android-build-tools.tar.zst             -C "$ANDROID_HOME/build-tools" "$BUILD_TOOLS"
+          tar -I 'zstd -6 -T0' -cf buildkit/android-build-tools.tar.zst \
+            -C "$ANDROID_HOME/build-tools" "$BUILD_TOOLS"
 
-      - name: Upload buildkit
+      - name: Upload buildkit support
         uses: actions/upload-artifact@v4
         with:
-          name: MK64Recomp-android-buildkit
-          path: buildkit/
+          name: MK64Recomp-android-buildkit-support
+          path: |
+            buildkit/sources/
+            buildkit/reference/
+            buildkit/android-build-tools.tar.zst
+            buildkit/build-tools-version.txt
+          compression-level: 0
+
+      - name: Upload NDK part 00
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK64Recomp-android-ndk-00
+          path: buildkit/android-ndk-r27d.tar.zst.part-00
+          compression-level: 0
+
+      - name: Upload NDK part 01
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK64Recomp-android-ndk-01
+          path: buildkit/android-ndk-r27d.tar.zst.part-01
+          compression-level: 0
+
+      - name: Upload NDK part 02
+        if: hashFiles('buildkit/android-ndk-r27d.tar.zst.part-02') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK64Recomp-android-ndk-02
+          path: buildkit/android-ndk-r27d.tar.zst.part-02
           compression-level: 0
