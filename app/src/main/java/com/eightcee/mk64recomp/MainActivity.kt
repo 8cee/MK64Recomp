@@ -17,6 +17,7 @@ class MainActivity : Activity() {
         Diagnostics.init(applicationContext)
         CrashHandler.install(applicationContext)
         Diagnostics.info("MainActivity.onCreate")
+        SaveManager.ensure(applicationContext)
         super.onCreate(savedInstanceState)
 
         window.decorView.systemUiVisibility =
@@ -47,6 +48,13 @@ class MainActivity : Activity() {
             }
         }
 
+        val settingsButton = Button(this).apply {
+            text = "Settings"
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+            }
+        }
+
         val diagnosticsButton = Button(this).apply {
             text = "Logs & Diagnostics"
             setOnClickListener {
@@ -63,6 +71,7 @@ class MainActivity : Activity() {
                 addView(importButton)
                 addView(launchButton)
                 addView(multiplayerButton)
+                addView(settingsButton)
                 addView(diagnosticsButton)
             }
         )
