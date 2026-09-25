@@ -13,10 +13,19 @@ jobs:
       - name: Checkout MK64 Android repo
         uses: actions/checkout@v4
 
-      - name: Checkout only MK64 generation inputs
+      - name: Checkout MK64 open-source build inputs
         run: |
           git submodule update --init upstream/MK64Recomp
-          git -C upstream/MK64Recomp submodule update --init MK64RecompSyms
+          git -C upstream/MK64Recomp submodule update --init --recursive \
+            MK64RecompSyms \
+            lib/N64ModernRuntime \
+            lib/RmlUi \
+            lib/freetype-windows-binaries \
+            lib/lunasvg \
+            lib/mk64 \
+            lib/rt64
+          rm -rf upstream/MK64Recomp/lib/slot_map
+          git clone --depth 1 https://github.com/SergeyMakeev/slot_map.git upstream/MK64Recomp/lib/slot_map
 
       - name: Install build tools
         run: |
