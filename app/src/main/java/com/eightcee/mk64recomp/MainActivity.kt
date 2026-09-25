@@ -40,6 +40,13 @@ class MainActivity : Activity() {
             setOnClickListener { initializeAndLaunch() }
         }
 
+        val multiplayerButton = Button(this).apply {
+            text = "Online Multiplayer"
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, MultiplayerActivity::class.java))
+            }
+        }
+
         val diagnosticsButton = Button(this).apply {
             text = "Logs & Diagnostics"
             setOnClickListener {
@@ -55,6 +62,7 @@ class MainActivity : Activity() {
                 addView(status)
                 addView(importButton)
                 addView(launchButton)
+                addView(multiplayerButton)
                 addView(diagnosticsButton)
             }
         )
