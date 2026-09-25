@@ -37,7 +37,7 @@ class MultiplayerClient {
                     socket = it
                 }
 
-                Diagnostics.info("MP connect host=" + host + " port=" + port + " room=" + roomCode)
+                Diagnostics.info("MP connect requested port=" + port + " room=" + roomCode)
                 sendJson(
                     s,
                     address,
