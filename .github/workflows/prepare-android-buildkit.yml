@@ -17,7 +17,7 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME"
           ls "$ANDROID_HOME/ndk"
           ls "$ANDROID_HOME/build-tools"
-          test -d "$ANDROID_HOME/ndk/27.0.12077973"
+          test -d "$ANDROID_HOME/ndk/27.3.13750724"
 
       - name: Fetch portable Android source dependencies
         run: |
@@ -37,7 +37,7 @@ jobs:
 
       - name: Package NDK
         run: |
-          tar -I 'zstd -6 -T0' -cf buildkit/android-ndk-r27.tar.zst             -C "$ANDROID_HOME/ndk" 27.0.12077973
+          tar -I 'zstd -6 -T0' -cf buildkit/android-ndk-r27d.tar.zst             -C "$ANDROID_HOME/ndk" 27.3.13750724
 
       - name: Package Android build-tools
         run: |
