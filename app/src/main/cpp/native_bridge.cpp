@@ -1,3 +1,4 @@
+#include "crash_handler.h"
 #include <jni.h>
 #include <android/log.h>
 #include <android/native_window.h>
@@ -51,6 +52,7 @@ Java_com_eightcee_mk64recomp_NativeBridge_initialize(
     env->ReleaseStringUTFChars(rom_path, raw_path);
     if (path.empty()) return -3;
 
+    mk64::crash::install();
     g_initialized.store(true);
     log_info("Native MK64 Android host initialized");
     return 0;
