@@ -10,6 +10,10 @@ class MultiplayerClient {
     private var socket: DatagramSocket? = null
     private var thread: Thread? = null
     private val running = AtomicBoolean(false)
+    @Volatile private var serverAddress: InetAddress? = null
+    @Volatile private var serverPort: Int = 0
+
+    @Volatile var onRelay: ((JSONObject) -> Unit)? = null
 
     @Volatile var roomCode: String = ""
         private set
@@ -26,6 +30,8 @@ class MultiplayerClient {
         thread = Thread({
             try {
                 val address = InetAddress.getByName(host)
+                serverAddress = address
+                serverPort = port
                 val s = DatagramSocket().also {
                     it.soTimeout = 1000
                     socket = it
@@ -86,6 +92,32 @@ class MultiplayerClient {
         thread?.interrupt()
         thread = null
         connected = false
+        serverAddress = null
+        serverPort = 0
+    }
+
+    fun sendRelay(channel: String, seq: Long, payload: JSONObject): Boolean {
+        val s = socket ?: return false
+        val address = serverAddress ?: return false
+        val port = serverPort
+        if (!connected || port <= 0) return false
+
+        return runCatching {
+            sendJson(
+                s,
+                address,
+                port,
+                JSONObject()
+                    .put("type", "relay")
+                    .put("room", roomCode)
+                    .put("channel", channel)
+                    .put("seq", seq)
+                    .put("payload", payload)
+            )
+            true
+        }.onFailure {
+            Diagnostics.error("MP relay send failed", it)
+        }.getOrDefault(false)
     }
 
     private fun handlePacket(obj: JSONObject) {
@@ -107,6 +139,7 @@ class MultiplayerClient {
             }
             "peer_joined" -> Diagnostics.info("MP peer joined")
             "peer_left" -> Diagnostics.info("MP peer left")
+            "relay" -> onRelay?.invoke(obj)
             "error" -> Diagnostics.warn("MP server error: " + obj.optString("message"))
         }
     }
