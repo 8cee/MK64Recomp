@@ -1,0 +1,53 @@
+name: Prepare Android Buildkit
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/prepare-android-buildkit.yml'
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Locate Android SDK components
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/ndk"
+          ls "$ANDROID_HOME/build-tools"
+          test -d "$ANDROID_HOME/ndk/27.0.12077973"
+
+      - name: Fetch portable Android source dependencies
+        run: |
+          mkdir -p buildkit/sources buildkit/reference
+
+          curl -L --fail --retry 3             https://github.com/libsdl-org/SDL/releases/download/release-2.30.8/SDL2-2.30.8.tar.gz             -o /tmp/SDL2.tar.gz
+          tar -xzf /tmp/SDL2.tar.gz -C buildkit/sources
+
+          curl -L --fail --retry 3             https://github.com/freetype/freetype/archive/refs/tags/VER-2-13-2.tar.gz             -o /tmp/freetype.tar.gz
+          tar -xzf /tmp/freetype.tar.gz -C buildkit/sources
+
+          git clone --depth 1 https://github.com/8cee/dk64-recomp-android.git /tmp/dk64
+          cp -a /tmp/dk64/android/patches buildkit/reference/
+          cp -a /tmp/dk64/android/native buildkit/reference/
+          cp -a /tmp/dk64/android/cmake buildkit/reference/
+          cp /tmp/dk64/android/app/CMakeLists.txt buildkit/reference/DK64-CMakeLists.txt
+
+      - name: Package NDK
+        run: |
+          tar -I 'zstd -6 -T0' -cf buildkit/android-ndk-r27.tar.zst             -C "$ANDROID_HOME/ndk" 27.0.12077973
+
+      - name: Package Android build-tools
+        run: |
+          BUILD_TOOLS="$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          echo "$BUILD_TOOLS" > buildkit/build-tools-version.txt
+          tar -I 'zstd -6 -T0' -cf buildkit/android-build-tools.tar.zst             -C "$ANDROID_HOME/build-tools" "$BUILD_TOOLS"
+
+      - name: Upload buildkit
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK64Recomp-android-buildkit
+          path: buildkit/
+          compression-level: 0
