@@ -2,14 +2,12 @@ package com.eightcee.mk64recomp
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.InputDevice
 import android.widget.FrameLayout
-import android.widget.TextView
 
 class GameActivity : Activity(), SurfaceHolder.Callback {
     private lateinit var surfaceView: SurfaceView
@@ -35,26 +33,15 @@ class GameActivity : Activity(), SurfaceHolder.Callback {
             )
         )
 
-        root.addView(
-            TouchControlsView(this),
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
+        if (AppSettings.touchControls(this)) {
+            root.addView(
+                TouchControlsView(this),
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
             )
-        )
-
-        root.addView(
-            TextView(this).apply {
-                text = "MK64 Android host"
-                textSize = 14f
-                alpha = 0.6f
-            },
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            )
-        )
+        }
 
         setContentView(root)
     }
