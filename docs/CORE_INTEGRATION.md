@@ -10,12 +10,20 @@ Expected ROM SHA-1:
 
 ## Generate the game source
 
-Build N64Recomp and RSPRecomp, then run:
+### Windows PowerShell
+
+Build `N64Recomp.exe` and `RSPRecomp.exe`, then run:
+
+```powershell
+.\tools\generate_mk64_core.ps1 -Rom "C:\path\to\mk64.us.z64" -N64Recomp "C:\path\to\N64Recomp.exe" -RSPRecomp "C:\path\to\RSPRecomp.exe"
+```
+
+### Linux/macOS
 
 ```bash
 N64RECOMP=/path/to/N64Recomp \
 RSPRECOMP=/path/to/RSPRecomp \
-./tools/generate_mk64_core.sh /path/to/mk64.us.z64
+bash ./tools/generate_mk64_core.sh /path/to/mk64.us.z64
 ```
 
 The script validates the ROM before generation and deletes the temporary ROM copy from the upstream working tree when it exits.
