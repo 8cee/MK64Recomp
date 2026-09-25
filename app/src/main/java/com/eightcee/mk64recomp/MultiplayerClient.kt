@@ -92,8 +92,10 @@ class MultiplayerClient {
         when (obj.optString("type")) {
             "joined" -> {
                 connected = true
+                val assignedRoom = obj.optString("room").trim().uppercase()
+                if (assignedRoom.isNotEmpty()) roomCode = assignedRoom
                 Diagnostics.info(
-                    "MP joined room=" + obj.optString("room") +
+                    "MP joined room=" + roomCode +
                         " players=" + obj.optInt("players")
                 )
             }
